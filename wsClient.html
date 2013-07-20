@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>WebSocket Test</title>
+	<style>
+		#outbox {
+			border: solid 1px #000;
+		}
+	</style>
+</head>
+<body>
+	
+	<form id="form">
+		<input type="text" id="msg">
+		<button type="submit">Send</button>
+	</form>
+	
+	<hr>
+	
+	<div id="outbox"></div>
+	
+	<script>
+	
+		var inputBox = document.getElementById("msg");
+		var output = document.getElementById("outbox");
+		var form = document.getElementById("form");
+		try {
+			var host = "ws://" + window.location.hostname + ":9876/stuff";
+			console.log("Host:", host);
+
+			var s = new WebSocket(host);
+			
+			s.onopen = function (e) {
+				console.log("Socket opened.");
+			};
+			
+
+			s.onmessage = function (e) {
+				console.log("Message received:", e.data);
+				var p = document.createElement("p");
+				p.innerHTML = e.data;
+				output.appendChild(p);
+			};
+			
+			s.onerror = function (e) {
+				console.log("Socket error:", e);
+			};
+            s.onclose = function (e) {
+                console.log("Socket closed.");
+            };
+
+		} catch (ex) {
+			console.log("Socket exception:", ex);
+		}
+
+		form.addEventListener("submit", function (e) {
+			e.preventDefault();
+			s.send(inputBox.value);
+			inputBox.value = "";
+		}, false)
+
+	</script>
+
+</body>
+</html>
